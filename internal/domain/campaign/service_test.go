@@ -4,6 +4,7 @@ import (
 	"emailn/internal/dto"
 	internalerrors "emailn/internal/internal-errors"
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -22,7 +23,7 @@ func (r *repositoryMock) Save(campaign *Campaign) error {
 var (
 	newCampaign = &dto.NewCampaign{
 		Name:     "Campaign X",
-		Content:  "Body",
+		Content:  "Content Body",
 		Contacts: []string{"email1@eee.com", "email2@eee.com"},
 	}
 )
@@ -55,12 +56,13 @@ func Test_Save_Repository(t *testing.T) {
 
 func Test_Save_ValidationError(t *testing.T) {
 	assert := assert.New(t)
+	expectedError := fmt.Errorf(internalerrors.ErrMinFieldPattern, "name", "5")
 	repo := &repositoryMock{}
 	service := NewService(repo)
 
 	_, err := service.Save(&dto.NewCampaign{})
 
-	assert.EqualError(err, ErrNameRequired)
+	assert.EqualError(err, expectedError.Error())
 }
 
 func Test_Save_RepositoryError(t *testing.T) {

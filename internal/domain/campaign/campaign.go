@@ -1,22 +1,22 @@
 package campaign
 
 import (
-	"errors"
+	internalerrors "emailn/internal/internal-errors"
 	"time"
 
 	"github.com/rs/xid"
 )
 
 type Contact struct {
-	Email string
+	Email string `validate:"required,email"`
 }
 
 type Campaign struct {
-	ID        string
-	Name      string
-	CreadetAt time.Time
-	Content   string
-	Contacts  []Contact
+	ID        string    `validate:"required"`
+	Name      string    `validate:"min=5,max=24"`
+	Content   string    `validate:"min=5,max=1024"`
+	Contacts  []Contact `validate:"min=1,dive"`
+	CreadetAt time.Time `validate:"required"`
 }
 
 func NewCampaign(name, content string, emails []string) (*Campaign, error) {
@@ -31,21 +31,8 @@ func NewCampaign(name, content string, emails []string) (*Campaign, error) {
 		CreadetAt: time.Now(),
 		Contacts:  contacts,
 	}
-	if err := newCampaign.validate(); err != nil {
+	if err := internalerrors.ValidateStruct(newCampaign); err != nil {
 		return nil, err
 	}
 	return newCampaign, nil
-}
-
-func (c *Campaign) validate() error {
-	if c.Name == "" {
-		return errors.New(ErrNameRequired)
-	}
-	if c.Content == "" {
-		return errors.New(ErrContentRequired)
-	}
-	if len(c.Contacts) == 0 {
-		return errors.New(ErrContactsRequired)
-	}
-	return nil
 }
