@@ -39,13 +39,13 @@ func NewCampaign(name, content string, emails []string) (*Campaign, error) {
 
 func (c *Campaign) validate() error {
 	if c.Name == "" {
-		return errors.New("name is required")
+		return errors.New(ErrNameRequired)
 	}
 	if c.Content == "" {
-		return errors.New("content is required")
+		return errors.New(ErrContentRequired)
 	}
 	if len(c.Contacts) == 0 {
-		return errors.New("at least one contact is required")
+		return errors.New(ErrContactsRequired)
 	}
 	return nil
 }

@@ -21,9 +21,9 @@ func Test_NewCampaign_CreateCampaign(t *testing.T) {
 
 	campaign, err := NewCampaign(name, content, emails)
 	assert.NoError(err)
-	assert.Equal(t, name, campaign.Name)
-	assert.Equal(t, content, campaign.Content)
-	assert.Equal(t, len(emails), len(campaign.Contacts))
+	assert.Equal(name, campaign.Name)
+	assert.Equal(content, campaign.Content)
+	assert.Equal(len(emails), len(campaign.Contacts))
 }
 
 func Test_NewCampaign_IDIsNotNil(t *testing.T) {
@@ -49,7 +49,7 @@ func Test_NewCampaign_MustValidateName(t *testing.T) {
 	campaign, err := NewCampaign("", content, emails)
 
 	assert.Nil(campaign)
-	assert.EqualError(err, "name is required")
+	assert.EqualError(err, ErrNameRequired)
 }
 
 func Test_NewCampaign_MustValidateContent(t *testing.T) {
@@ -58,7 +58,7 @@ func Test_NewCampaign_MustValidateContent(t *testing.T) {
 	campaign, err := NewCampaign(name, "", emails)
 
 	assert.Nil(campaign)
-	assert.EqualError(err, "content is required")
+	assert.EqualError(err, ErrContentRequired)
 }
 
 func Test_NewCampaign_MustValidateEmails(t *testing.T) {
@@ -67,5 +67,5 @@ func Test_NewCampaign_MustValidateEmails(t *testing.T) {
 	campaign, err := NewCampaign(name, content, []string{})
 
 	assert.Nil(campaign)
-	assert.EqualError(err, "at least one contact is required")
+	assert.EqualError(err, ErrContactsRequired)
 }
