@@ -28,11 +28,18 @@ var (
 	}
 )
 
+func Test_NewService(t *testing.T) {
+	assert := assert.New(t)
+	_, err := NewService(nil)
+
+	assert.EqualError(err, internalerrors.ErrRepositoryNil.Error())
+}
+
 func Test_Save_NewCampaign(t *testing.T) {
 	assert := assert.New(t)
 	repo := &repositoryMock{}
 	repo.On("Save", mock.Anything).Return(nil)
-	service := NewService(repo)
+	service, _ := NewService(repo)
 
 	id, err := service.Save(newCampaign)
 
@@ -47,7 +54,7 @@ func Test_Save_Repository(t *testing.T) {
 			c.Content == newCampaign.Content &&
 			len(c.Contacts) == len(newCampaign.Contacts)
 	})).Return(nil)
-	service := NewService(repo)
+	service, _ := NewService(repo)
 
 	service.Save(newCampaign)
 
@@ -58,7 +65,7 @@ func Test_Save_ValidationError(t *testing.T) {
 	assert := assert.New(t)
 	expectedError := fmt.Errorf(internalerrors.ErrMinFieldPattern, "name", "5")
 	repo := &repositoryMock{}
-	service := NewService(repo)
+	service, _ := NewService(repo)
 
 	_, err := service.Save(&dto.NewCampaign{})
 
@@ -69,7 +76,7 @@ func Test_Save_RepositoryError(t *testing.T) {
 	assert := assert.New(t)
 	repo := &repositoryMock{}
 	repo.On("Save", mock.Anything).Return(errors.New("error"))
-	service := NewService(repo)
+	service, _ := NewService(repo)
 
 	_, err := service.Save(newCampaign)
 	assert.True(errors.Is(err, internalerrors.ErrInternalServer))

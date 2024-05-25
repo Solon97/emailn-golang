@@ -11,10 +11,13 @@ type Service struct {
 	repository Repository
 }
 
-func NewService(repository Repository) *Service {
+func NewService(repository Repository) (*Service, error) {
+	if repository == nil {
+		return nil, internalerrors.ErrRepositoryNil
+	}
 	return &Service{
 		repository: repository,
-	}
+	}, nil
 }
 
 func (s *Service) Save(newCampaign *dto.NewCampaign) (string, error) {

@@ -1,0 +1,7 @@
+POST http://localhost:3000/campaigns
+
+{
+    "name": "asdkjada",
+    "content": "email content",
+    "contacts": ["teste@teste.com"]
+}
