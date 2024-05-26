@@ -2,7 +2,7 @@ package campaign
 
 import (
 	"emailn/internal/dto"
-	internalerrors "emailn/internal/internal-errors"
+	internalerrors "emailn/internal/errors"
 	"errors"
 	"fmt"
 	"testing"
@@ -15,9 +15,14 @@ type repositoryMock struct {
 	mock.Mock
 }
 
-func (r *repositoryMock) Save(campaign *Campaign) error {
+func (r *repositoryMock) Create(campaign *Campaign) error {
 	args := r.Called(campaign)
 	return args.Error(0)
+}
+
+func (r *repositoryMock) GetAll() ([]Campaign, error) {
+	args := r.Called()
+	return args.Get(0).([]Campaign), args.Error(1)
 }
 
 var (
@@ -35,50 +40,50 @@ func Test_NewService(t *testing.T) {
 	assert.EqualError(err, internalerrors.ErrRepositoryNil.Error())
 }
 
-func Test_Save_NewCampaign(t *testing.T) {
+func Test_Create_NewCampaign(t *testing.T) {
 	assert := assert.New(t)
 	repo := &repositoryMock{}
-	repo.On("Save", mock.Anything).Return(nil)
+	repo.On("Create", mock.Anything).Return(nil)
 	service, _ := NewService(repo)
 
-	id, err := service.Save(newCampaign)
+	id, err := service.Create(newCampaign)
 
 	assert.NoError(err)
 	assert.NotEmpty(id)
 }
 
-func Test_Save_Repository(t *testing.T) {
+func Test_Create_UseRepository(t *testing.T) {
 	repo := &repositoryMock{}
-	repo.On("Save", mock.MatchedBy(func(c *Campaign) bool {
+	repo.On("Create", mock.MatchedBy(func(c *Campaign) bool {
 		return c.Name == newCampaign.Name &&
 			c.Content == newCampaign.Content &&
 			len(c.Contacts) == len(newCampaign.Contacts)
 	})).Return(nil)
 	service, _ := NewService(repo)
 
-	service.Save(newCampaign)
+	service.Create(newCampaign)
 
 	repo.AssertExpectations(t)
 }
 
-func Test_Save_ValidationError(t *testing.T) {
+func Test_Create_ValidationError(t *testing.T) {
 	assert := assert.New(t)
 	expectedError := fmt.Errorf(internalerrors.ErrMinFieldPattern, "name", "5")
 	repo := &repositoryMock{}
 	service, _ := NewService(repo)
 
-	_, err := service.Save(&dto.NewCampaign{})
+	_, err := service.Create(&dto.NewCampaign{})
 
 	assert.EqualError(err, expectedError.Error())
 }
 
-func Test_Save_RepositoryError(t *testing.T) {
+func Test_Create_RepositoryError(t *testing.T) {
 	assert := assert.New(t)
 	repo := &repositoryMock{}
-	repo.On("Save", mock.Anything).Return(errors.New("error"))
+	repo.On("Create", mock.Anything).Return(errors.New("error"))
 	service, _ := NewService(repo)
 
-	_, err := service.Save(newCampaign)
+	_, err := service.Create(newCampaign)
 	assert.True(errors.Is(err, internalerrors.ErrInternalServer))
 	repo.AssertExpectations(t)
 }

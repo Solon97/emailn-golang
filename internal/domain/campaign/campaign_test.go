@@ -1,7 +1,7 @@
 package campaign
 
 import (
-	internalerrors "emailn/internal/internal-errors"
+	internalerrors "emailn/internal/errors"
 	"fmt"
 	"testing"
 	"time"

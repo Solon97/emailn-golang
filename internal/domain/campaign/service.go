@@ -2,7 +2,7 @@ package campaign
 
 import (
 	"emailn/internal/dto"
-	internalerrors "emailn/internal/internal-errors"
+	internalerrors "emailn/internal/errors"
 
 	"github.com/sirupsen/logrus"
 )
@@ -20,14 +20,18 @@ func NewService(repository Repository) (*Service, error) {
 	}, nil
 }
 
-func (s *Service) Save(newCampaign *dto.NewCampaign) (string, error) {
+func (s *Service) Create(newCampaign *dto.NewCampaign) (string, error) {
 	campaign, err := NewCampaign(newCampaign.Name, newCampaign.Content, newCampaign.Contacts)
 	if err != nil {
 		return "", err
 	}
-	if err := s.repository.Save(campaign); err != nil {
+	if err := s.repository.Create(campaign); err != nil {
 		logrus.WithError(err).Error("error saving campaign")
 		return "", internalerrors.ErrInternalServer
 	}
 	return campaign.ID, nil
+}
+
+func (s *Service) GetAll() ([]Campaign, error) {
+	return s.repository.GetAll()
 }
