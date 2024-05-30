@@ -7,20 +7,25 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type Service struct {
+type Service interface {
+	Create(newCampaign *dto.NewCampaign) (string, error)
+	GetAll() ([]Campaign, error)
+}
+
+type CampaignService struct {
 	repository Repository
 }
 
-func NewService(repository Repository) (*Service, error) {
+func NewCampaignService(repository Repository) (*CampaignService, error) {
 	if repository == nil {
 		return nil, internalerrors.ErrRepositoryNil
 	}
-	return &Service{
+	return &CampaignService{
 		repository: repository,
 	}, nil
 }
 
-func (s *Service) Create(newCampaign *dto.NewCampaign) (string, error) {
+func (s *CampaignService) Create(newCampaign *dto.NewCampaign) (string, error) {
 	campaign, err := NewCampaign(newCampaign.Name, newCampaign.Content, newCampaign.Contacts)
 	if err != nil {
 		return "", err
@@ -32,6 +37,6 @@ func (s *Service) Create(newCampaign *dto.NewCampaign) (string, error) {
 	return campaign.ID, nil
 }
 
-func (s *Service) GetAll() ([]Campaign, error) {
+func (s *CampaignService) GetAll() ([]Campaign, error) {
 	return s.repository.GetAll()
 }

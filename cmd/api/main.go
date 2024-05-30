@@ -17,12 +17,12 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	campaignService, err := campaign.NewService(&database.CampaignRepository{})
+	campaignService, err := campaign.NewCampaignService(&database.CampaignRepository{})
 	if err != nil {
 		panic(err)
 	}
 
-	campaignHandler := handler.NewCampaignHandler(*campaignService)
+	campaignHandler := handler.NewCampaignHandler(campaignService)
 
 	r.Post("/campaigns", campaignHandler.CreateCampaign)
 	r.Get("/campaigns", campaignHandler.GetCampaign)
