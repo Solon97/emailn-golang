@@ -3,6 +3,7 @@ package campaign
 import (
 	"emailn/internal/dto"
 	"emailn/internal/handlers"
+	"errors"
 	"net/http"
 
 	"github.com/go-chi/render"
@@ -15,7 +16,7 @@ func (handler *CampaignHandler) CreateCampaign(w http.ResponseWriter, r *http.Re
 		return
 	}
 	if validationErrorMessage != "" {
-		handlers.HandleError(w, r, err)
+		handlers.HandleError(w, r, errors.New(validationErrorMessage))
 		return
 	}
 

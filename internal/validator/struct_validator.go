@@ -1,6 +1,7 @@
-package internalerrors
+package validator
 
 import (
+	internalerrors "emailn/internal/errors"
 	"fmt"
 	"strings"
 
@@ -17,13 +18,13 @@ func ValidateStruct(s interface{}) error {
 	field := strings.ToLower(validationError.Field())
 	switch validationError.Tag() {
 	case "required":
-		return fmt.Errorf(ErrRequiredFieldPattern, field)
+		return fmt.Errorf(internalerrors.ErrRequiredFieldPattern, field)
 	case "min":
-		return fmt.Errorf(ErrMinFieldPattern, field, validationError.Param())
+		return fmt.Errorf(internalerrors.ErrMinFieldPattern, field, validationError.Param())
 	case "max":
-		return fmt.Errorf(ErrMaxFieldPattern, field, validationError.Param())
+		return fmt.Errorf(internalerrors.ErrMaxFieldPattern, field, validationError.Param())
 	case "email":
-		return fmt.Errorf(ErrEmailFieldPattern, field)
+		return fmt.Errorf(internalerrors.ErrEmailFieldPattern, field)
 	}
 
 	return err

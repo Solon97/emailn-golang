@@ -98,10 +98,10 @@ func Test_CreateCampaign_EmptyBody(t *testing.T) {
 	res := httptest.NewRecorder()
 	handler.CreateCampaign(res, req)
 	assert.Equal(http.StatusBadRequest, res.Code)
-	assert.Contains(res.Body.String(), "empty body")
+	assert.Contains(res.Body.String(), "empty request body")
 }
 
-func Test_CreateCampaign_DecodeJSONError(t *testing.T) {
+func Test_CreateCampaign_InvalidBodyFieldType(t *testing.T) {
 	assert := assert.New(t)
 	handler := &CampaignHandler{
 		service: &serviceMock{},
@@ -111,7 +111,9 @@ func Test_CreateCampaign_DecodeJSONError(t *testing.T) {
 		t.Fatal(err)
 	}
 	w := httptest.NewRecorder()
+
 	handler.CreateCampaign(w, req)
+
 	assert.Equal(http.StatusBadRequest, w.Code)
-	assert.Contains(w.Body.String(), "invalid name")
+	assert.Contains(w.Body.String(), "name: Invalid type")
 }

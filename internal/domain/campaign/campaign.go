@@ -1,7 +1,7 @@
 package campaign
 
 import (
-	internalerrors "emailn/internal/errors"
+	"emailn/internal/validator"
 	"time"
 
 	"github.com/rs/xid"
@@ -31,7 +31,7 @@ func NewCampaign(name, content string, emails []string) (*Campaign, error) {
 		CreadetAt: time.Now(),
 		Contacts:  contacts,
 	}
-	if err := internalerrors.ValidateStruct(newCampaign); err != nil {
+	if err := validator.ValidateStruct(newCampaign); err != nil {
 		return nil, err
 	}
 	return newCampaign, nil

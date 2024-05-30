@@ -1,7 +1,7 @@
 package dto
 
 import (
-	jsonvalidator "emailn/pkg/json_validator"
+	"emailn/internal/validator"
 	"io"
 )
 
@@ -33,7 +33,7 @@ type NewCampaign struct {
 }
 
 func NewCampaignDto(requestBody io.ReadCloser) (*NewCampaign, string, error) {
-	newCampaign, validation, err := jsonvalidator.ValidateJSON[NewCampaign](requestBody, jsonSchema)
+	newCampaign, validation, err := validator.ValidateJSON[NewCampaign](requestBody, jsonSchema)
 	if err != nil {
 		return nil, "", err
 	}

@@ -1,4 +1,4 @@
-package jsonvalidator
+package validator
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 
 func ValidateJSON[T any](requestBody io.ReadCloser, jsonSchema string) (structBody *T, validationMessage string, err error) {
 	if requestBody == nil {
-		return nil, "", fmt.Errorf("request body is nil")
+		return nil, "", fmt.Errorf("empty request body")
 	}
 	if jsonSchema == "" {
 		return nil, "", fmt.Errorf("json schema is empty")
