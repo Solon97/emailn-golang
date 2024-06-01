@@ -14,6 +14,10 @@ func (r *CampaignRepository) Create(campaign *campaign.Campaign) error {
 	return nil
 }
 
-func (r *CampaignRepository) GetAll() ([]campaign.Campaign, error) {
-	return []campaign.Campaign{}, errors.New("not implemented")
+func (r *CampaignRepository) GetById(id string) (*campaign.Campaign, error) {
+	return nil, errors.New("not implemented")
+}
+
+func (r *CampaignRepository) UpdateSendStatus(id string, status campaign.SendStatus) error {
+	return errors.New("not implemented")
 }
