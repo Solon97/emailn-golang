@@ -3,6 +3,7 @@ package campaign_service
 import (
 	entity "emailn/internal/domain/campaign"
 	internalerrors "emailn/internal/errors"
+	internalMock "emailn/test/mock"
 	"errors"
 	"testing"
 	"time"
@@ -28,7 +29,7 @@ func Test_UpdateSendStatus(t *testing.T) {
 
 	t.Run("Success", func(t *testing.T) {
 		newStatus := entity.SendStatusStarted
-		repo := &repositoryMock{}
+		repo := new(internalMock.CampaignRepositoryMock)
 		repo.On("GetById", mock.Anything).Return(campaign, nil)
 		repo.On("UpdateSendStatus",
 			mock.MatchedBy(func(id string) bool { return id == campaign.ID }),
@@ -40,7 +41,7 @@ func Test_UpdateSendStatus(t *testing.T) {
 	})
 
 	t.Run("Not found Campaign", func(t *testing.T) {
-		repo := &repositoryMock{}
+		repo := new(internalMock.CampaignRepositoryMock)
 		repo.On("GetById", mock.Anything).Return(nil, ErrCampaignNotFound)
 		service, _ := NewCampaignService(repo)
 		err := service.UpdateSendStatus(campaign.ID, entity.SendStatusStarted)
@@ -48,7 +49,7 @@ func Test_UpdateSendStatus(t *testing.T) {
 	})
 
 	t.Run("Internal Server Error in GetById", func(t *testing.T) {
-		repo := &repositoryMock{}
+		repo := new(internalMock.CampaignRepositoryMock)
 		repo.On("GetById", mock.Anything).Return(campaign, internalerrors.ErrInternalServer)
 		service, _ := NewCampaignService(repo)
 		err := service.UpdateSendStatus(campaign.ID, entity.SendStatusStarted)
@@ -57,7 +58,7 @@ func Test_UpdateSendStatus(t *testing.T) {
 
 	t.Run("Internal Server Error in UpdateSendStatus", func(t *testing.T) {
 		newStatus := entity.SendStatusStarted
-		repo := &repositoryMock{}
+		repo := new(internalMock.CampaignRepositoryMock)
 		repo.On("GetById", mock.Anything).Return(campaign, nil)
 		repo.On("UpdateSendStatus",
 			mock.MatchedBy(func(id string) bool { return id == campaign.ID }),

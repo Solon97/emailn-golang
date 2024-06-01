@@ -4,6 +4,7 @@ import (
 	entity "emailn/internal/domain/campaign"
 	"emailn/internal/dto"
 	internalerrors "emailn/internal/errors"
+	internalMock "emailn/test/mock"
 	"errors"
 	"fmt"
 	"testing"
@@ -14,11 +15,9 @@ import (
 
 func Test_Create(t *testing.T) {
 	assert := assert.New(t)
-	repo := &repositoryMock{}
-	service, _ := NewCampaignService(repo)
 
 	t.Run("Success", func(t *testing.T) {
-		repo := &repositoryMock{}
+		repo := new(internalMock.CampaignRepositoryMock)
 		repo.On("Create", mock.Anything).Return(nil)
 		service, _ := NewCampaignService(repo)
 
@@ -29,7 +28,7 @@ func Test_Create(t *testing.T) {
 	})
 
 	t.Run("Use repository", func(t *testing.T) {
-		repo := &repositoryMock{}
+		repo := new(internalMock.CampaignRepositoryMock)
 		repo.On("Create", mock.MatchedBy(func(c *entity.Campaign) bool {
 			return c.Name == newCampaign.Name &&
 				c.Content == newCampaign.Content &&
@@ -43,6 +42,9 @@ func Test_Create(t *testing.T) {
 	})
 
 	t.Run("Validation Error", func(t *testing.T) {
+		repo := new(internalMock.CampaignRepositoryMock)
+		repo.On("Create", mock.Anything).Return(nil)
+		service, _ := NewCampaignService(repo)
 		expectedError := fmt.Errorf(internalerrors.ErrMinFieldPattern, "name", "5")
 
 		_, err := service.Create(&dto.NewCampaign{})
@@ -51,7 +53,7 @@ func Test_Create(t *testing.T) {
 	})
 
 	t.Run("Repository Error", func(t *testing.T) {
-		repo := &repositoryMock{}
+		repo := new(internalMock.CampaignRepositoryMock)
 		repo.On("Create", mock.Anything).Return(errors.New("error"))
 		service, _ := NewCampaignService(repo)
 

@@ -3,6 +3,7 @@ package campaign_service
 import (
 	"emailn/internal/dto"
 	internalerrors "emailn/internal/errors"
+	"errors"
 
 	"github.com/sirupsen/logrus"
 )
@@ -14,7 +15,7 @@ func (s *CampaignService) GetById(id string) (*dto.GetCampaignResponse, error) {
 		return nil, internalerrors.ErrInternalServer
 	}
 	if campaign == nil {
-		return nil, nil
+		return nil, errors.New("campaign not found")
 	}
 	return &dto.GetCampaignResponse{
 		ID:         campaign.ID,

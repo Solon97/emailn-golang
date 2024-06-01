@@ -3,6 +3,7 @@ package campaign_service
 import (
 	entity "emailn/internal/domain/campaign"
 	internalerrors "emailn/internal/errors"
+	internalMock "emailn/test/mock"
 	"errors"
 	"testing"
 	"time"
@@ -26,7 +27,7 @@ func Test_GetById(t *testing.T) {
 	}
 
 	t.Run("Success", func(t *testing.T) {
-		repo := &repositoryMock{}
+		repo := new(internalMock.CampaignRepositoryMock)
 		repo.On("GetById", mock.MatchedBy(func(id string) bool { return id == campaign.ID })).Return(campaign, nil)
 		service, _ := NewCampaignService(repo)
 
@@ -40,7 +41,7 @@ func Test_GetById(t *testing.T) {
 	})
 
 	t.Run("Repository error", func(t *testing.T) {
-		repo := &repositoryMock{}
+		repo := new(internalMock.CampaignRepositoryMock)
 		repo.On("GetById", mock.Anything).Return(nil, errors.New("repository error"))
 		service, _ := NewCampaignService(repo)
 		_, err := service.GetById(campaign.ID)
@@ -49,13 +50,13 @@ func Test_GetById(t *testing.T) {
 	})
 
 	t.Run("Not found Campaign", func(t *testing.T) {
-		repo := &repositoryMock{}
+		repo := new(internalMock.CampaignRepositoryMock)
 		repo.On("GetById", mock.Anything).Return(nil, nil)
 		service, _ := NewCampaignService(repo)
 
 		campaignResponse, err := service.GetById(campaign.ID)
 
-		assert.NoError(err)
+		assert.EqualError(err, "campaign not found")
 		assert.Nil(campaignResponse)
 	})
 

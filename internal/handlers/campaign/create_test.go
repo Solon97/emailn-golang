@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"emailn/internal/dto"
 	internalerrors "emailn/internal/errors"
+	internalMock "emailn/test/mock"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -26,7 +27,7 @@ func Test_Create(t *testing.T) {
 	assert := assert.New(t)
 
 	t.Run("Success", func(t *testing.T) {
-		service := &serviceMock{}
+		service := new(internalMock.CampaignServiceMock)
 		service.On("Create", newCampaign).Return("1", nil)
 		handler := &CampaignHandler{
 			service: service,
@@ -42,7 +43,7 @@ func Test_Create(t *testing.T) {
 	})
 
 	t.Run("Service error", func(t *testing.T) {
-		service := &serviceMock{}
+		service := new(internalMock.CampaignServiceMock)
 		service.On("Create", newCampaign).Return("", errors.New("error"))
 		handler := &CampaignHandler{
 			service: service,
@@ -59,7 +60,7 @@ func Test_Create(t *testing.T) {
 
 	t.Run("Empty body", func(t *testing.T) {
 		handler := &CampaignHandler{
-			service: &serviceMock{},
+			service: new(internalMock.CampaignServiceMock),
 		}
 		req, _ := http.NewRequest("POST", "/campaigns", nil)
 		res := httptest.NewRecorder()
@@ -69,7 +70,7 @@ func Test_Create(t *testing.T) {
 	})
 
 	t.Run("Internal server error", func(t *testing.T) {
-		service := &serviceMock{}
+		service := new(internalMock.CampaignServiceMock)
 		service.On("Create", newCampaign).Return("", internalerrors.ErrInternalServer)
 		handler := &CampaignHandler{
 			service: service,
@@ -86,7 +87,7 @@ func Test_Create(t *testing.T) {
 
 	t.Run("Invalid body field type", func(t *testing.T) {
 		handler := &CampaignHandler{
-			service: &serviceMock{},
+			service: new(internalMock.CampaignServiceMock),
 		}
 		req, err := http.NewRequest("POST", "/campaigns", strings.NewReader(`{"name": 1, "content": "Content Body", "contacts": ["email1@eee.com", "email2@eee.com"]}`))
 		if err != nil {
