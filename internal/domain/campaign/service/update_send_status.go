@@ -8,16 +8,17 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+var ErrCampaignNotFound = errors.New("campaign not found")
+
 func (s *CampaignService) UpdateSendStatus(id string, status campaign.SendStatus) error {
-	_, err := s.repository.GetById(id)
+	campaign, err := s.repository.GetById(id)
 	if err != nil {
-		if errors.Is(err, internalerrors.ErrInternalServer) {
-			logrus.WithField("function", "UpdateSendStatus").WithError(err).Error("error retrieving campaign")
-			return internalerrors.ErrInternalServer
-		}
 		return err
 	}
-	if err := s.repository.UpdateSendStatus(id, status); err != nil {
+	if campaign == nil {
+		return ErrCampaignNotFound
+	}
+	if err := s.repository.UpdateSendStatus(campaign.ID, status); err != nil {
 		logrus.WithField("function", "UpdateSendStatus").WithError(err).Error("error updating campaign")
 		return internalerrors.ErrInternalServer
 	}

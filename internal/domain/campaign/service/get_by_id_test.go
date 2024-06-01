@@ -30,9 +30,13 @@ func Test_GetById(t *testing.T) {
 		repo.On("GetById", mock.MatchedBy(func(id string) bool { return id == campaign.ID })).Return(campaign, nil)
 		service, _ := NewCampaignService(repo)
 
-		_, err := service.GetById(campaign.ID)
+		campaignResponse, err := service.GetById(campaign.ID)
 
 		assert.NoError(err)
+		assert.Equal(campaign.ID, campaignResponse.ID)
+		assert.Equal(campaign.Name, campaignResponse.Name)
+		assert.Equal(campaign.Content, campaignResponse.Content)
+		assert.Equal(string(campaign.SendStatus), campaignResponse.SendStatus)
 	})
 
 	t.Run("Repository error", func(t *testing.T) {
@@ -49,9 +53,10 @@ func Test_GetById(t *testing.T) {
 		repo.On("GetById", mock.Anything).Return(nil, nil)
 		service, _ := NewCampaignService(repo)
 
-		_, err := service.GetById(campaign.ID)
+		campaignResponse, err := service.GetById(campaign.ID)
 
-		assert.True(errors.Is(err, ErrCampaignNotFound))
+		assert.NoError(err)
+		assert.Nil(campaignResponse)
 	})
 
 }

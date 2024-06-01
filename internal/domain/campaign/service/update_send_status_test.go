@@ -41,7 +41,7 @@ func Test_UpdateSendStatus(t *testing.T) {
 
 	t.Run("Not found Campaign", func(t *testing.T) {
 		repo := &repositoryMock{}
-		repo.On("GetById", mock.Anything).Return(nil, errors.New("campaign not found"))
+		repo.On("GetById", mock.Anything).Return(nil, ErrCampaignNotFound)
 		service, _ := NewCampaignService(repo)
 		err := service.UpdateSendStatus(campaign.ID, entity.SendStatusStarted)
 		assert.EqualError(err, "campaign not found")
