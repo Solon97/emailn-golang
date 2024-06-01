@@ -1,12 +1,14 @@
 package campaign
 
-import "emailn/internal/domain/campaign"
+import (
+	service "emailn/internal/domain/campaign/service"
+)
 
 type CampaignHandler struct {
-	service campaign.Service
+	service service.Service
 }
 
-func NewCampaignHandler(service campaign.Service) *CampaignHandler {
+func NewCampaignHandler(service service.Service) *CampaignHandler {
 	return &CampaignHandler{
 		service: service,
 	}
