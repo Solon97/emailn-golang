@@ -19,7 +19,7 @@ const (
 type Contact struct {
 	ID         string `validate:"required"`
 	Email      string `validate:"required,email"`
-	CampaignID string `validate:"required"`
+	CampaignID string
 }
 
 type Campaign struct {
