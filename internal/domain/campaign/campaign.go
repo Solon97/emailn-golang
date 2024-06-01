@@ -7,16 +7,26 @@ import (
 	"github.com/rs/xid"
 )
 
+type SendStatus string
+
+const (
+	SendStatusPending SendStatus = "pending"
+	SendStatusStarted SendStatus = "started"
+	SendstatusDone    SendStatus = "done"
+	SendStatusFailed  SendStatus = "failed"
+)
+
 type Contact struct {
 	Email string `validate:"required,email"`
 }
 
 type Campaign struct {
-	ID        string    `validate:"required"`
-	Name      string    `validate:"min=5,max=24"`
-	Content   string    `validate:"min=5,max=1024"`
-	Contacts  []Contact `validate:"min=1,dive"`
-	CreadetAt time.Time `validate:"required"`
+	ID         string     `validate:"required"`
+	Name       string     `validate:"min=5,max=24"`
+	Content    string     `validate:"min=5,max=1024"`
+	Contacts   []Contact  `validate:"min=1,dive"`
+	SendStatus SendStatus `validate:"oneof=pending started done failed"`
+	CreadetAt  time.Time  `validate:"required"`
 }
 
 func NewCampaign(name, content string, emails []string) (*Campaign, error) {
@@ -25,11 +35,12 @@ func NewCampaign(name, content string, emails []string) (*Campaign, error) {
 		contacts[idx].Email = email
 	}
 	newCampaign := &Campaign{
-		ID:        xid.New().String(),
-		Name:      name,
-		Content:   content,
-		CreadetAt: time.Now(),
-		Contacts:  contacts,
+		ID:         xid.New().String(),
+		Name:       name,
+		Content:    content,
+		CreadetAt:  time.Now(),
+		Contacts:   contacts,
+		SendStatus: SendStatusPending,
 	}
 	if err := validator.ValidateStruct(newCampaign); err != nil {
 		return nil, err
