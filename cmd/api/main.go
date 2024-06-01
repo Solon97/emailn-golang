@@ -18,7 +18,9 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	campaignService, err := service.NewCampaignService(&database.CampaignRepository{})
+	db := database.NewDB()
+	campaignRepository := database.NewCampaignRepository(db)
+	campaignService, err := service.NewCampaignService(campaignRepository)
 	if err != nil {
 		panic(err)
 	}

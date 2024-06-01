@@ -2,22 +2,34 @@ package database
 
 import (
 	"emailn/internal/domain/campaign"
-	"errors"
+
+	"gorm.io/gorm"
 )
 
 type CampaignRepository struct {
-	campaigns []campaign.Campaign
+	db *gorm.DB
+}
+
+func NewCampaignRepository(db *gorm.DB) *CampaignRepository {
+	return &CampaignRepository{db: db}
 }
 
 func (r *CampaignRepository) Create(campaign *campaign.Campaign) error {
-	r.campaigns = append(r.campaigns, *campaign)
-	return nil
+	return r.db.Create(campaign).Error
 }
 
 func (r *CampaignRepository) GetById(id string) (*campaign.Campaign, error) {
-	return nil, errors.New("not implemented")
+	var campaign *campaign.Campaign
+	tx := r.db.Where("id = ?", id).First(&campaign)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	if tx.RowsAffected == 0 {
+		return nil, nil
+	}
+	return campaign, nil
 }
 
 func (r *CampaignRepository) UpdateSendStatus(id string, status campaign.SendStatus) error {
-	return errors.New("not implemented")
+	return r.db.Model(&campaign.Campaign{}).Where("id = ?", id).Update("send_status", status).Error
 }
