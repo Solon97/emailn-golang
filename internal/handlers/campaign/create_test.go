@@ -2,7 +2,6 @@ package campaign
 
 import (
 	"bytes"
-	"emailn/internal/domain/campaign"
 	"emailn/internal/dto"
 	internalerrors "emailn/internal/errors"
 	"encoding/json"
@@ -13,7 +12,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 var (
@@ -24,96 +22,81 @@ var (
 	}
 )
 
-type serviceMock struct {
-	mock.Mock
-}
-
-func (r *serviceMock) Create(newCampaign *dto.NewCampaign) (string, error) {
-	args := r.Called(newCampaign)
-	return args.String(0), args.Error(1)
-}
-
-func (r *serviceMock) GetAll() ([]campaign.Campaign, error) {
-	args := r.Called()
-	return args.Get(0).([]campaign.Campaign), args.Error(1)
-}
-
-func Test_CreateCampaign_SaveNewCampaign(t *testing.T) {
+func Test_Create(t *testing.T) {
 	assert := assert.New(t)
-	service := &serviceMock{}
-	service.On("Create", newCampaign).Return("1", nil)
-	handler := &CampaignHandler{
-		service: service,
-	}
-	var buf bytes.Buffer
-	json.NewEncoder(&buf).Encode(newCampaign)
-	req, _ := http.NewRequest("POST", "/campaigns", &buf)
-	res := httptest.NewRecorder()
 
-	handler.CreateCampaign(res, req)
+	t.Run("Success", func(t *testing.T) {
+		service := &serviceMock{}
+		service.On("Create", newCampaign).Return("1", nil)
+		handler := &CampaignHandler{
+			service: service,
+		}
+		var buf bytes.Buffer
+		json.NewEncoder(&buf).Encode(newCampaign)
+		req, _ := http.NewRequest("POST", "/campaigns", &buf)
+		res := httptest.NewRecorder()
 
-	assert.Equal(http.StatusCreated, res.Code)
-}
+		handler.Create(res, req)
 
-func Test_CreateCampaign_ServiceError(t *testing.T) {
-	assert := assert.New(t)
-	service := &serviceMock{}
-	service.On("Create", newCampaign).Return("", errors.New("error"))
-	handler := &CampaignHandler{
-		service: service,
-	}
-	var buf bytes.Buffer
-	json.NewEncoder(&buf).Encode(newCampaign)
-	req, _ := http.NewRequest("POST", "/campaigns", &buf)
-	res := httptest.NewRecorder()
+		assert.Equal(http.StatusCreated, res.Code)
+	})
 
-	handler.CreateCampaign(res, req)
+	t.Run("Service error", func(t *testing.T) {
+		service := &serviceMock{}
+		service.On("Create", newCampaign).Return("", errors.New("error"))
+		handler := &CampaignHandler{
+			service: service,
+		}
+		var buf bytes.Buffer
+		json.NewEncoder(&buf).Encode(newCampaign)
+		req, _ := http.NewRequest("POST", "/campaigns", &buf)
+		res := httptest.NewRecorder()
 
-	assert.Equal(http.StatusBadRequest, res.Code)
-}
+		handler.Create(res, req)
 
-func Test_CreateCampaign_InternalServerError(t *testing.T) {
-	assert := assert.New(t)
-	service := &serviceMock{}
-	service.On("Create", newCampaign).Return("", internalerrors.ErrInternalServer)
-	handler := &CampaignHandler{
-		service: service,
-	}
-	var buf bytes.Buffer
-	json.NewEncoder(&buf).Encode(newCampaign)
-	req, _ := http.NewRequest("POST", "/campaigns", &buf)
-	res := httptest.NewRecorder()
+		assert.Equal(http.StatusBadRequest, res.Code)
+	})
 
-	handler.CreateCampaign(res, req)
+	t.Run("Empty body", func(t *testing.T) {
+		handler := &CampaignHandler{
+			service: &serviceMock{},
+		}
+		req, _ := http.NewRequest("POST", "/campaigns", nil)
+		res := httptest.NewRecorder()
+		handler.Create(res, req)
+		assert.Equal(http.StatusBadRequest, res.Code)
+		assert.Contains(res.Body.String(), "empty request body")
+	})
 
-	assert.Equal(http.StatusInternalServerError, res.Code)
-}
+	t.Run("Internal server error", func(t *testing.T) {
+		service := &serviceMock{}
+		service.On("Create", newCampaign).Return("", internalerrors.ErrInternalServer)
+		handler := &CampaignHandler{
+			service: service,
+		}
+		var buf bytes.Buffer
+		json.NewEncoder(&buf).Encode(newCampaign)
+		req, _ := http.NewRequest("POST", "/campaigns", &buf)
+		res := httptest.NewRecorder()
 
-func Test_CreateCampaign_EmptyBody(t *testing.T) {
-	assert := assert.New(t)
-	handler := &CampaignHandler{
-		service: &serviceMock{},
-	}
-	req, _ := http.NewRequest("POST", "/campaigns", nil)
-	res := httptest.NewRecorder()
-	handler.CreateCampaign(res, req)
-	assert.Equal(http.StatusBadRequest, res.Code)
-	assert.Contains(res.Body.String(), "empty request body")
-}
+		handler.Create(res, req)
 
-func Test_CreateCampaign_InvalidBodyFieldType(t *testing.T) {
-	assert := assert.New(t)
-	handler := &CampaignHandler{
-		service: &serviceMock{},
-	}
-	req, err := http.NewRequest("POST", "/campaigns", strings.NewReader(`{"name": 1, "content": "Content Body", "contacts": ["email1@eee.com", "email2@eee.com"]}`))
-	if err != nil {
-		t.Fatal(err)
-	}
-	w := httptest.NewRecorder()
+		assert.Equal(http.StatusInternalServerError, res.Code)
+	})
 
-	handler.CreateCampaign(w, req)
+	t.Run("Invalid body field type", func(t *testing.T) {
+		handler := &CampaignHandler{
+			service: &serviceMock{},
+		}
+		req, err := http.NewRequest("POST", "/campaigns", strings.NewReader(`{"name": 1, "content": "Content Body", "contacts": ["email1@eee.com", "email2@eee.com"]}`))
+		if err != nil {
+			t.Fatal(err)
+		}
+		w := httptest.NewRecorder()
 
-	assert.Equal(http.StatusBadRequest, w.Code)
-	assert.Contains(w.Body.String(), "name: Invalid type")
+		handler.Create(w, req)
+
+		assert.Equal(http.StatusBadRequest, w.Code)
+		assert.Contains(w.Body.String(), "name: Invalid type")
+	})
 }

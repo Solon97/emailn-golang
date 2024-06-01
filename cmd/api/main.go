@@ -24,7 +24,7 @@ func main() {
 
 	campaignHandler := handler.NewCampaignHandler(campaignService)
 
-	r.Post("/campaigns", campaignHandler.CreateCampaign)
+	r.Post("/campaigns", campaignHandler.Create)
 	r.Get("/campaigns", campaignHandler.GetCampaign)
 
 	http.ListenAndServe(":3000", r)

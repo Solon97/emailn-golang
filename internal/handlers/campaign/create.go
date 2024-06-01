@@ -9,7 +9,7 @@ import (
 	"github.com/go-chi/render"
 )
 
-func (handler *CampaignHandler) CreateCampaign(w http.ResponseWriter, r *http.Request) {
+func (handler *CampaignHandler) Create(w http.ResponseWriter, r *http.Request) {
 	newCampaign, validationErrorMessage, err := dto.NewCampaignDto(r.Body)
 	if err != nil {
 		handlers.HandleError(w, r, err)
