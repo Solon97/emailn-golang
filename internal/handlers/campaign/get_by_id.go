@@ -7,12 +7,13 @@ import (
 	"github.com/go-chi/render"
 )
 
-func (handler *CampaignHandler) GetCampaign(w http.ResponseWriter, r *http.Request) {
-	campaigns, err := handler.service.GetAll()
+func (handler *CampaignHandler) GetByID(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Path[len("/campaigns/"):]
+	campaign, err := handler.service.GetById(id)
 	if err != nil {
 		handlers.HandleError(w, r, err)
 		return
 	}
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, campaigns)
+	render.JSON(w, r, campaign)
 }
