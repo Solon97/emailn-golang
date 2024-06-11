@@ -1,6 +1,7 @@
 package main
 
 import (
+	"emailn/internal/handlers"
 	handler "emailn/internal/handlers/campaign"
 	"emailn/internal/infrastructure/database"
 	"net/http"
@@ -27,8 +28,8 @@ func main() {
 
 	campaignHandler := handler.NewCampaignHandler(campaignService)
 
-	r.Post("/campaigns", campaignHandler.Create)
-	r.Get("/campaigns/{id}", campaignHandler.GetByID)
+	r.Post("/campaigns", handlers.HandleError(campaignHandler.Create))
+	r.Get("/campaigns/{id}", handlers.HandleError(campaignHandler.GetByID))
 
 	http.ListenAndServe(":3000", r)
 }

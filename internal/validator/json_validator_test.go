@@ -44,8 +44,10 @@ func TestValidateJSON(t *testing.T) {
 	})
 
 	t.Run("Empty request body", func(t *testing.T) {
-		_, _, err := ValidateJSON[structSchema](nil, schema)
-		assert.NotNil(err)
+		_, validationMessage, err := ValidateJSON[structSchema](nil, schema)
+		assert.Nil(err)
+		assert.NotEmpty(validationMessage)
+		assert.Equal(EmptyBodyValidationMessage, validationMessage)
 	})
 
 	t.Run("Empty JSON schema", func(t *testing.T) {

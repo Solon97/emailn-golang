@@ -34,9 +34,11 @@ func Test_GetCampaignByID(t *testing.T) {
 		req, _ := http.NewRequest("POST", fmt.Sprintf("/campaigns/%s", campaignResponse.ID), nil)
 		res := httptest.NewRecorder()
 
-		handler.GetByID(res, req)
+		responseBody, statusCode, err := handler.GetByID(res, req)
 
-		assert.Equal(http.StatusOK, res.Code)
+		assert.Equal(http.StatusOK, statusCode)
+		assert.Nil(err)
+		assert.Equal(campaignResponse, responseBody)
 		service.AssertExpectations(t)
 	})
 
@@ -49,10 +51,11 @@ func Test_GetCampaignByID(t *testing.T) {
 		req, _ := http.NewRequest("POST", fmt.Sprintf("/campaigns/%s", campaignResponse.ID), nil)
 		res := httptest.NewRecorder()
 
-		handler.GetByID(res, req)
+		responseBody, statusCode, err := handler.GetByID(res, req)
 
-		assert.Equal(http.StatusNotFound, res.Code)
-		assert.True(strings.Contains(res.Body.String(), "campaign not found"))
+		assert.Equal(http.StatusNotFound, statusCode)
+		assert.True(strings.Contains(err.Error(), "campaign not found"))
+		assert.Nil(responseBody)
 		service.AssertExpectations(t)
 	})
 
@@ -65,10 +68,11 @@ func Test_GetCampaignByID(t *testing.T) {
 		req, _ := http.NewRequest("POST", fmt.Sprintf("/campaigns/%s", campaignResponse.ID), nil)
 		res := httptest.NewRecorder()
 
-		handler.GetByID(res, req)
+		responseBody, statusCode, err := handler.GetByID(res, req)
 
-		assert.Equal(http.StatusInternalServerError, res.Code)
-		assert.True(strings.Contains(res.Body.String(), internalerrors.ErrInternalServer.Error()))
+		assert.Equal(http.StatusInternalServerError, statusCode)
+		assert.True(strings.Contains(err.Error(), internalerrors.ErrInternalServer.Error()))
+		assert.Nil(responseBody)
 		service.AssertExpectations(t)
 	})
 }

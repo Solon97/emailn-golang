@@ -18,6 +18,7 @@ func NewCampaignService(repository Repository) (*CampaignService, error) {
 	if repository == nil {
 		return nil, internalerrors.ErrRepositoryNil
 	}
+	// TODO: Create Domain Custom Errors
 	return &CampaignService{
 		repository: repository,
 	}, nil
